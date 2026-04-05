@@ -5,11 +5,13 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    private Vector2 moveInput;
+    private Vector2 moveInput = Vector2.zero;
     private Vector2 cameraMoveInput;
+    private float maxRotationY = 88.0f;
+
     public float moveSpeed = 6.0f;
-    public float cameraSpeed = 30.0f;
-    public float jumpPower = 250.0f;
+    public float mouseSensitivity = 0.2f;
+    public float jumpPower = 5.0f;
     private bool isJump = false;
     public GameObject playerCameraX;
     public GameObject playerCameraY;
@@ -30,14 +32,15 @@ public class Player : MonoBehaviour
 
     private void OnLook(InputValue value)
     {
-        cameraMoveInput = value.Get<Vector2>();         // 마우스, 또는 게임패드의 움직임을 받고 저장한다
+        cameraMoveInput += value.Get<Vector2>() * mouseSensitivity;         // 마우스, 또는 게임패드의 움직임을 받고 저장한다
+        cameraMoveInput.y = Mathf.Clamp(cameraMoveInput.y, -maxRotationY, maxRotationY);
     }
 
     private void OnJump(InputValue value)               // 점프 감지
     {
         if(! isJump)
         {
-            rb.AddForce(transform.up * jumpPower);
+            rb.AddForce(transform.up * jumpPower, ForceMode.Impulse);
             isJump = true;
         }
     }
@@ -55,19 +58,11 @@ public class Player : MonoBehaviour
     {
         transform.Translate(moveInput.x * moveSpeed * Time.deltaTime, 0, moveInput.y * moveSpeed * Time.deltaTime);
 
+        playerCameraX.transform.localRotation = Quaternion.AngleAxis(cameraMoveInput.x, Vector3.up);
+        playerCameraY.transform.localRotation = Quaternion.AngleAxis(cameraMoveInput.y, Vector3.left);
+
+
         // rb.AddRelativeForce(moveInput.x * moveSpeed * Time.deltaTime, 0, moveInput.y * moveSpeed * Time.deltaTime);
         // 이동 후 바로 멈추지 않고 미끄러짐
-
-        playerCameraX.transform.Rotate(0, cameraMoveInput.x * cameraSpeed * Time.deltaTime, 0);
-        playerCameraY.transform.Rotate(-cameraMoveInput.y * cameraSpeed * Time.deltaTime, 0, 0);
-        // Debug.Log(playerCameraY.transform.rotation.x);
-
-        // -90 ~90 -0.7~0.7
-        // 90 180 -180 -90 -0.7~0.7  ??
-
-        if (playerCameraY.transform.rotation.x > 0.7f || playerCameraY.transform.rotation.x < -0.7f)
-        {
-            playerCameraY.transform.Rotate(cameraMoveInput.y * cameraSpeed * Time.deltaTime, 0, 0);
-        }
     }
 }

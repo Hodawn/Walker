@@ -267,8 +267,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moveSpeed: 6
-  cameraSpeed: 30
-  jumpPower: 250
+  mouseSensitivity: 0.2
+  jumpPower: 5
   playerCameraX: {fileID: 359839999}
   playerCameraY: {fileID: 768866914}
 --- !u!114 &359840001
